@@ -99,6 +99,33 @@ A reader MUST validate every entry's destination before writing anything, MUST r
 whole archive if any entry escapes the target directory or passes through a symlink, and
 MUST skip entries outside the areas and root files above.
 
+### 1.6 Media (images, audio, documents)
+
+Things a mind makes or receives live under `memory/media/`, so they travel wherever `memory/`
+travels (the archive, the envelope and the plain export alike):
+
+```
+memory/media/registry.jsonl        one JSON object per line, append-only
+memory/media/images/<file>         image/png, image/jpeg, image/gif, image/webp
+memory/media/audios/<file>         audio/*
+memory/media/documents/<file>      text/plain, text/markdown, application/pdf
+memory/media/settings.json         {"keep_prompts": true|false}
+```
+
+A registry line: `{"id", "kind", "media_type", "name", "path", "ts", "source", "size", "origin",
+"caption"}` and, only when the mind keeps prompts, `"prompt"`. `path` is relative to
+`memory/media/` with `/` separators. `origin` is `made`, `received` or `imported`. A line
+`{"id", "deleted": true, "ts", "by"}` is a tombstone. The last line for an id wins.
+
+**The id is the SHA-256 of the file's bytes** (64 lowercase hex). Inside the mind's own text
+(journal, palace, letters) a media object appears only as a **reference**, `[media:<id>]`,
+never as inline bytes. The same bytes have the same reference in every mind, the reference
+proves the bytes are unchanged, and a reference grants no access by itself.
+
+A reader importing a mind MUST check, before writing anything, that every registry id of 64 hex
+whose file is present equals the SHA-256 of that file, and refuse the whole import otherwise.
+Ids of 32 hex are an earlier random form; they are accepted without the check.
+
 ---
 
 ## 2. The sealed envelope (AEDMIND2)

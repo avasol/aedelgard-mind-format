@@ -156,20 +156,46 @@ files/             config/, memory/, skills/, commands/, extensions/ as plain fi
           "status": "active", "…": "every other key exactly as stored"}}
 ```
 
-`status` is one of `active`, `superseded`, `historical`. Superseded and retired memories
-MUST be exported: the history is part of the mind.
+- `collection` is the store's collection name without its library prefix (`drawers`, `closets`, …).
+  Every collection is exported, not only `drawers`.
+- `meta` holds every stored metadata key exactly as stored (strings, numbers, booleans), plus
+  `status`, one of `active`, `superseded`, `historical`. A writer derives `status` from the stored
+  lifecycle key and writes `active` when there is none. A reader that stores `status` back MUST NOT
+  invent a lifecycle key for an `active` memory that had none.
+- Superseded and retired memories MUST be exported: the history is part of the mind.
+- No embeddings, ever. A reader recomputes them.
 
 **`facts.jsonl`** — one triple per line:
 
 ```json
-{"subject": "…", "predicate": "…", "object": "…",
- "valid_from": "2026-10-08", "valid_to": null, "source": "…"}
+{"id": "…", "subject": "Lord Isildur", "predicate": "prefers", "object": "direct commits",
+ "valid_from": "2026-10-08", "valid_to": null, "source": "…",
+ "meta": {"subject_id": "lord_isildur", "object_id": "direct_commits", "confidence": 1.0,
+          "…": "every other stored column exactly as stored"}}
 ```
 
-`valid_to: null` means the fact is still true.
+- `subject` and `object` are the entities' display names; `meta.subject_id` and `meta.object_id`
+  are the ids the graph links by.
+- `valid_to: null` means the fact is still true.
+- `source` is the most specific provenance the fact has (a drawer id, else a file, else null).
+
+**`entities.jsonl`** (since 2026-10-09, optional for readers) — one graph node per line:
+`{"id": "…", "name": "…", "type": "…", "properties": {…}, "created_at": "…"}`.
+
+**Writing.** Lines are JSON with sorted keys, one object per line, sorted by `(collection, id)` for
+drawers and by `id` for facts and entities, so two exports of the same mind are byte-identical.
+
+**Importing.** A reader that imports a plain export into a body:
+- MUST import only into an empty mind (no memories, no facts) and refuse otherwise;
+- MUST check the whole export before writing anything: the manifest's `format` and `version`,
+  `counts` against the actual lines, no duplicate ids, and every `files/` entry under the rules of
+  1.2 and 1.5 (only `config/`, `memory/`, `skills/`, `commands/`, `extensions/`; nothing absolute,
+  no `..`, no backslash, no symlink, nothing excluded);
+- keeps `config/mind_id`: an imported mind is the same mind.
 
 **Round trip:** importing a plain export into an empty mind, then exporting it again, MUST give
-the same `drawers.jsonl` and `facts.jsonl` (line order aside). Readers MUST ignore unknown keys.
+the same `drawers.jsonl`, `facts.jsonl` and `entities.jsonl` (line order aside), and the same
+`files/`. Readers MUST ignore unknown keys.
 
 ---
 

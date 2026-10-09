@@ -15,7 +15,7 @@ That is the point.
 |---|---|---|
 | [1. The mind archive](#1-the-mind-archive) | The zip that holds a whole mind | Built, in every body |
 | [2. The sealed envelope](#2-the-sealed-envelope-aedmind2) | How a mind is encrypted for backup and sync | Built (AEDMIND2) |
-| [3. The plain export](#3-the-plain-export) | A mind in text, readable without any database library | **Specified; not yet built** |
+| [3. The plain export](#3-the-plain-export) | A mind in text, readable without any database library | Built (Mind 1.27.52-mind) |
 | [4. Extension packages](#4-extension-packages-aedext) | `.aedext`, the author signature, the review countersignature | Built |
 | [5. The catalogue trust chain](#5-the-catalogue-trust-chain) | Root → working key → package, signed index, recall list | Built |
 
@@ -131,9 +131,14 @@ then, num_chunks times:
 
 ## 3. The plain export
 
-**Status: specified here; not yet built.** Until it ships, the only export is the archive of
-section 1. This section is published first on purpose: the format should be fixed in the
-open before the code exists, not reverse-engineered from it afterwards.
+**Status: built.** Shipped in the Aedelgard body, Mind 1.27.52-mind (2026-10-09): Export and
+Import buttons on the Mind page. Proven at real scale before release: a mind of 83,913
+memories, 299 facts and 485 entities was exported, imported into an empty body (vectors
+recomputed), and exported again; all three files came back byte-identical.
+
+*History:* this section was published on 2026-10-08 as "specified here; not yet built", on
+purpose: the format was fixed in the open before the code existed, not reverse-engineered
+from it afterwards.
 
 A plain export is a zip (or a folder) that any program can read with nothing but a JSON
 parser. It carries no embeddings and no database files: vectors are recomputed by whatever
@@ -278,7 +283,7 @@ means a human at Aedelgard read it. It is not a sandbox.
 - **Changes are made here first,** in public, before any body ships them.
 - **Open code:** section 4 (packages and signatures) is implemented in the open engine,
   [avasol/galadriel-public](https://github.com/avasol/galadriel-public), tag
-  `reference-2026-10-08` (`harness/ext_signing.py`, `harness/extensions.py`). Sections 1, 2 and 5
+  `reference-2026-10-08` (`harness/ext_signing.py`, `harness/extensions.py`). Sections 1, 2, 3 and 5
   are implemented in the Aedelgard body, whose code is not public. This document, not any
   code, is the source of truth. A body that disagrees with it has a bug.
 
